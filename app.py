@@ -3,23 +3,12 @@ import requests
 
 
 DEFAULT_SEQ = "MGSSHHHHHHSSGLVPRGSHMRGPNPTAASLEASAGPFTVRSFTVSRPSGYGAGTVYYPTNAGGTVGAIAIVPGYTARQSSIKWWGPRLASHGFVVITIDTNSTLDQPSSRSSQQMAALRQVASLNGTSSSPIYGKVDTARMGVMGWSMGGGGSLISAANNPSLKAAAPQAPWDSSTNFSSVTVPTLIFACENDSIAPVNSSALPIYDSMSRNAKQFLEINGGSHSCANSGNSNQALIGKKGVAWMKRFMDNDTRYSTFACENPNSTRVSDFRTANCSLEDPAANKARKEAELAAATAEQ"
-
-
-from Bio.PDB.PDBList import PDBList
 from Bio.PDB import PDBParser
 
 def read_mol(pdb_string):
-    pdb_file = "temp.pdb"
+    parser = PDBParser(QUIET=True)
+    structure = parser.get_structure("protein", pdb_string)
 
-    # Save the PDB string to a temporary file
-    with open(pdb_file, "w") as fp:
-        fp.write(pdb_string)
-
-    # Use the PDBParser to parse the temporary file
-    parser = PDBParser()
-    structure = parser.get_structure("protein", pdb_file)
-
-    # Extract the chain and residue information
     chains = []
     residues = []
     for model in structure:
@@ -28,11 +17,9 @@ def read_mol(pdb_string):
             for residue in chain:
                 residues.append(residue.resname.strip())
 
-    # Remove the temporary file
-    os.remove(pdb_file)
-
-    # Return the chains and residues
     return chains, residues
+
+
 
 
 
