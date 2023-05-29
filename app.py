@@ -5,13 +5,28 @@ import requests
 DEFAULT_SEQ = "MGSSHHHHHHSSGLVPRGSHMRGPNPTAASLEASAGPFTVRSFTVSRPSGYGAGTVYYPTNAGGTVGAIAIVPGYTARQSSIKWWGPRLASHGFVVITIDTNSTLDQPSSRSSQQMAALRQVASLNGTSSSPIYGKVDTARMGVMGWSMGGGGSLISAANNPSLKAAAPQAPWDSSTNFSSVTVPTLIFACENDSIAPVNSSALPIYDSMSRNAKQFLEINGGSHSCANSGNSNQALIGKKGVAWMKRFMDNDTRYSTFACENPNSTRVSDFRTANCSLEDPAANKARKEAELAAATAEQ"
 
 
-def read_mol(molpath):
-    with open(molpath, "r") as fp:
-        lines = fp.readlines()
-    mol = ""
-    for l in lines:
-        mol += l
-    return mol
+from Bio.PDB import PDBParser
+from io import StringIO
+
+def read_mol(pdb_string):
+    # Use the Bio.PDB module to parse the PDB string
+    parser = PDBParser()
+    structure = parser.get_structure("protein", StringIO(pdb_string))
+
+    # Get the first model in the structure (assuming single model)
+    model = structure[0]
+
+    # Extract the chain and residue information
+    chains = []
+    residues = []
+    for chain in model:
+        chains.append(chain.id)
+        for residue in chain:
+            residues.append(residue.resname.strip())
+
+    # Return the chains and residues
+    return chains, residues
+
 
 
 def molecule(input_pdb):
