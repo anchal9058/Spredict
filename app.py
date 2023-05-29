@@ -5,21 +5,31 @@ import requests
 DEFAULT_SEQ = "MGSSHHHHHHSSGLVPRGSHMRGPNPTAASLEASAGPFTVRSFTVSRPSGYGAGTVYYPTNAGGTVGAIAIVPGYTARQSSIKWWGPRLASHGFVVITIDTNSTLDQPSSRSSQQMAALRQVASLNGTSSSPIYGKVDTARMGVMGWSMGGGGSLISAANNPSLKAAAPQAPWDSSTNFSSVTVPTLIFACENDSIAPVNSSALPIYDSMSRNAKQFLEINGGSHSCANSGNSNQALIGKKGVAWMKRFMDNDTRYSTFACENPNSTRVSDFRTANCSLEDPAANKARKEAELAAATAEQ"
 
 
-def read_mol(pdb_string):
-    # Use the Bio.PDB module to parse the PDB string
-    parser = PDBParser()
-    structure = parser.get_structure("protein", StringIO(pdb_string))
+from Bio.PDB.PDBList import PDBList
+from Bio.PDB import PDBParser
 
-    # Get the first model in the structure (assuming single model)
-    model = structure[0]
+def read_mol(pdb_string):
+    pdb_file = "temp.pdb"
+
+    # Save the PDB string to a temporary file
+    with open(pdb_file, "w") as fp:
+        fp.write(pdb_string)
+
+    # Use the PDBParser to parse the temporary file
+    parser = PDBParser()
+    structure = parser.get_structure("protein", pdb_file)
 
     # Extract the chain and residue information
     chains = []
     residues = []
-    for chain in model:
-        chains.append(chain.id)
-        for residue in chain:
-            residues.append(residue.resname.strip())
+    for model in structure:
+        for chain in model:
+            chains.append(chain.id)
+            for residue in chain:
+                residues.append(residue.resname.strip())
+
+    # Remove the temporary file
+    os.remove(pdb_file)
 
     # Return the chains and residues
     return chains, residues
